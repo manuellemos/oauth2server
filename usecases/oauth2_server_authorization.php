@@ -18,31 +18,14 @@ class oauth2_server_authorization_class
 {
 	public $error = '';
 	public $exit = false;
-	public $debug = true;
-	public $debug_output = '';
-	public $debug_prefix = 'OAuth server authorization: ';
-	public $log_file_name = '';
+	public $options;
 
 	private $error_code = OAUTH2_ERROR_NONE;
 	private $error_message = '';
 
-	Function OutputDebug($message)
-	{
-		if($this->debug)
-		{
-			$message = $this->debug_prefix.$message;
-			$this->debug_output .= $message."\n";
-			if(strlen($this->log_file_name))
-				error_log($message."\n", 3, $this->log_file_name);
-			else
-				error_log($message);
-		}
-		return(true);
-	}
-
 	Function SetAuthorizationError($error_code, $error_message)
 	{
-		$this->OutputDebug('Authorization error '.$error_code.': '.$error_message);
+		$this->options->OutputDebug('Authorization error '.$error_code.': '.$error_message);
 		$this->error_code = $error_code;
 		$this->error_message = $error_message;
 		return true;
@@ -86,24 +69,29 @@ class oauth2_server_authorization_class
 		}
 		Header('HTTP/1.0 302 Redirect');
 		Header('Location: '.$redirect);
-		$this->OutputDebug('Redirecting an error to: '.$redirect);
+		$this->options->OutputDebug('Redirecting an error to: '.$redirect);
 		return true;
 	}
 	
 	Function Initialize()
 	{
+		if(!IsSet($this->options))
+		{
+			$this->error = 'the options object was not set in the authorization class';
+			return false;
+		}
 		return true;
 	}
 
 	Function Process()
 	{
-		$this->OutputDebug('Checking the redirect URI...');
+		$this->options->OutputDebug('Checking the redirect URI...');
 		if(!$this->ValidateRedirectURI($redirect_uri))
 			return false;
 		if($this->error_code !== OAUTH2_ERROR_NONE)
 			return true;
-		$this->OutputDebug('The redirect URI is: '.$redirect_uri);
-		$this->OutputDebug('Checking the response type...');
+		$this->options->OutputDebug('The redirect URI is: '.$redirect_uri);
+		$this->options->OutputDebug('Checking the response type...');
 		$response_type = (IsSet($_GET['response_type']) ? $_GET['response_type'] : '');
 		$state = (IsSet($_GET['state']) ? $_GET['state'] : null);
 		switch($response_type)
@@ -117,7 +105,7 @@ class oauth2_server_authorization_class
 				);
 				return $this->RedirectError($redirect_uri, $details, $state);
 		}
-		$this->OutputDebug('The response type is: '.$response_type);
+		$this->options->OutputDebug('The response type is: '.$response_type);
 		return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization processs is not yet fully implemented');
 	}
 	

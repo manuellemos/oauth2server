@@ -10,7 +10,7 @@ $__classmap = array();
 
 require(__DIR__.DIRECTORY_SEPARATOR.'classmaps.php');
 
-Function __autoload($class)
+spl_autoload_register(function($class)
 {
 	global $__classmap;
 
@@ -31,6 +31,6 @@ Function __autoload($class)
 		else
 			include $class_file;
 	}
-}
+}, false, true);
 
 ?>

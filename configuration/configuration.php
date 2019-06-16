@@ -7,30 +7,14 @@
 
 class configuration_options_class
 {
-	var $application_path = '';
-	var $application_name = 'OAuth 2 Server';
-	var $debug = false;
-	var $debug_http = true;
-	var $maintenance = false;
-
-/*
-	var $site_url = 'https://web.4duser.com/';
-	var $contact_email = 'info@4duser.com';
-
-	var $search_console_client_id = '';
-	var $search_console_client_secret = '';
-	var $google_site_verification = '';
-
-	var $locale = 'en';
-	var $supported_locales = array(
-		'en'=> true,
-		'pt'=> true
-	);
-	var $text = array();
-	var $locale_contexts = array();
-	var $web = true;
-	var $library_base_directory = '';
-*/
+	public $application_path = '';
+	public $application_name = 'OAuth 2 Server';
+	public $debug = false;
+	public $debug_http = true;
+	public $maintenance = false;
+	public $debug_output = '';
+	public $debug_prefix = 'OAuth server authorization: ';
+	public $log_file_name = '';
 
 	Function ErrorHandler($error, $message, $file, $line, $backtrace)
 	{
@@ -148,136 +132,20 @@ class configuration_options_class
 		}
 		return $log_text;
 	}
-
-/*
-	Function StartSession()
+	
+	Function OutputDebug($message)
 	{
-		if(!$this->web)
+		if($this->debug)
 		{
-			trigger_error('Session can only be started on a Web access');
-			return false;
-		}
-		if(!function_exists('session_start'))
-		{
-			trigger_error('Session variables are not accessible in this PHP environment');
-			return false;
-		}
-		if(session_id() === ''
-		&& !session_start())
-		{
-			$message = 'it was not possible to start the PHP session';
-			$e = error_get_last();
-			if(IsSet($e))
-				$error.=": ".$e['message'];
-			trigger_error($message);
-			return false;
-		}
-		return true;
-	}
-
-	Function LoadLocale($context)
-	{
-		if(!IsSet($this->locale_contexts[$context]))
-		{
-			if($this->web
-			&& !IsSet($_SESSION['locale'])
-			&& $this->StartSession())
-			{
-				if(IsSet($_SESSION['locale']))
-				{
-					$this->locale = $_SESSION['locale'];
-				}
-				else
-				{
-					if(IsSet($_SERVER['HTTP_ACCEPT_LANGUAGE']))
-					{
-						$accept = preg_split("/[\s;]+/", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-						foreach($accept as $language)
-						{
-							$languages = preg_split("/[\s,]+/", $language);
-							foreach($languages as $locale)
-							{
-								$locale = trim(strtolower(strtok($locale, '-')));
-								if(substr($locale, 0, 2) === 'q=')
-									continue;
-								if(IsSet($this->supported_locales[$locale]))
-								{
-									$this->locale = $locale;
-									break 2;
-								}
-							}
-						}
-					}
-					$_SESSION['locale'] = $this->locale;
-				}
-			}
-			if(strcmp($context, 'common')
-			&& !IsSet($this->locale_contexts['common']))
-				$this->LoadLocale('common');
-			$text = array();
-			$path = $this->application_path.'/configuration/locale/'.$this->locale.'/'.$context.'.php';
-			if(file_exists($path))
-			{
-				include($path);
-				if(count($text))
-					$this->text += $text;
-				$this->locale_contexts[$context] = $this->locale;
-			}
+			$message = $this->debug_prefix.$message;
+			$this->debug_output .= $message."\n";
+			if(strlen($this->log_file_name))
+				error_log($message."\n", 3, $this->log_file_name);
 			else
-				trigger_error('Missing locale file: "'.$path.'"');
+				error_log($message);
 		}
+		return(true);
 	}
-
-	Function LoadProfile($profile)
-	{
-		if(!IsSet($profile)
-		|| !IsSet($profile->locale)
-		|| !IsSet($this->supported_locales[$locale = strtok($profile->locale, '-')])
-		|| $this->locale === $locale)
-			return;
-		if($this->StartSession())
-		{
-			$contexts = array_keys($this->locale_contexts);
-			$this->text = $this->locale_contexts = array();
-			$this->locale = $_SESSION['locale'] = $locale;
-			foreach($contexts as $context)
-				$this->LoadLocale($context);
-		}
-	}
-
-	Function GetText($text)
-	{
-		if(IsSet($this->text[$text]))
-			 return($this->text[$text]);
-		if($this->debug)
-			trigger_error('Missing locale text: "'.$text.'"');
-		return($text);
-	}
-
-	Function GetTextLabel($text)
-	{
-		return(preg_replace('/(^.*)_([^_]+)_(.*)$/', '\\1<u>\\2</u>\\3', $this->GetHtmlText($text)));
-	}
-
-	Function GetTextAccessKey($text)
-	{
-		return(preg_replace('/^.*_([^_]+)_.*$/', '\\1', $this->GetText($text)));
-	}
-
-	Function GetTextArray($text)
-	{
-		if(IsSet($this->text[$text]))
-			 return($this->text[$text]);
-		if($this->debug)
-			trigger_error('Missing locale text array: "'.$text.'"');
-		return(array());
-	}
-
-	Function GetHTMLText($text)
-	{
-		return(HtmlSpecialChars($this->GetText($text)));
-	}
-*/
 };
 
 ?>
