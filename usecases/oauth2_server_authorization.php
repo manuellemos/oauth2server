@@ -118,7 +118,14 @@ class oauth2_server_authorization_class
 	{
 		if($this->error_code !== OAUTH2_ERROR_NONE)
 		{
+			$page_template = new page_template_class;
+			$page_template->options = $this->options;
+			$page_template->title_prefix = '';
+			$page_template->title =  HtmlSpecialChars($this->options->application_name);
+			$page_template->title = $this->options->GetHtmlText('Authorization error');
+			$page_template->header();
 			echo '<p>It was not finish the authorization process due to an error (',  $this->error_code, '): '.HtmlSpecialChars($this->error_message).'</p>';
+			$page_template->footer();
 		}
 	}
 };

@@ -15,6 +15,13 @@ class configuration_options_class
 	public $debug_output = '';
 	public $debug_prefix = 'OAuth server authorization: ';
 	public $log_file_name = '';
+	public $report_missing_locale_text = true;
+	public $site_url = '';
+	public $contact_email = 'mlemos@acm.org';
+	public $theme = 'default';
+	public $google_site_verification = '';
+
+	private $text = array();
 
 	Function ErrorHandler($error, $message, $file, $line, $backtrace)
 	{
@@ -145,6 +152,19 @@ class configuration_options_class
 				error_log($message);
 		}
 		return(true);
+	}
+	Function GetText($text)
+	{
+		if(IsSet($this->text[$text]))
+			 return($this->text[$text]);
+		if($this->report_missing_locale_text)
+			$this->OutputDebug('Missing locale text: "'.$text.'"');
+		return($text);
+	}
+
+	Function GetHTMLText($text)
+	{
+		return(HtmlSpecialChars($this->GetText($text)));
 	}
 };
 
