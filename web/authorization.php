@@ -15,7 +15,7 @@
 	$options->initialize();
 
 	if($options->maintenance)
-		$case = new use_case_maintenance_class;
+		$case = new oauth2_server_maintenance_class;
 	else
 		$case = new oauth2_server_authorization_class;
 	$case->options = &$options;
@@ -27,10 +27,9 @@
 		$case->output();
 	else
 	{
-		$error_case = new use_case_error_class;
+		$error_case = new oauth2_server_error_class;
 		$error_case->options = &$options;
 		$error_case->error = $case->error;
-		$error_case->debug = $case->debug;
 		if($error_case->initialize()
 		&& $error_case->finalize($error_case->process()))
 			$error_case->output();
