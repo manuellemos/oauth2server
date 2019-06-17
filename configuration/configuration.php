@@ -20,8 +20,15 @@ class configuration_options_class
 	public $contact_email = 'mlemos@acm.org';
 	public $theme = 'default';
 	public $google_site_verification = '';
+	public $web = true;
 
+	private $locale = 'en';
+	private $supported_locales = array(
+		'en'=> true,
+		'pt'=> true
+	);
 	private $text = array();
+	private $locale_contexts = array();
 
 	Function ErrorHandler($error, $message, $file, $line, $backtrace)
 	{
@@ -153,6 +160,82 @@ class configuration_options_class
 		}
 		return(true);
 	}
+
+	Function StartSession()
+	{
+		return false;
+	}
+
+	Function LoadLocale($context)
+	{
+		if(!IsSet($this->locale_contexts[$context]))
+		{
+			if($this->web
+			&& !IsSet($_SESSION['locale'])
+			&& $this->StartSession())
+			{
+				if(IsSet($_SESSION['locale']))
+				{
+					$this->locale = $_SESSION['locale'];
+				}
+				else
+				{
+					if(IsSet($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+					{
+						$accept = preg_split("/[\s;]+/", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+						foreach($accept as $language)
+						{
+							$languages = preg_split("/[\s,]+/", $language);
+							foreach($languages as $locale)
+							{
+								$locale = trim(strtolower(strtok($locale, '-')));
+								if(substr($locale, 0, 2) === 'q=')
+									continue;
+								if(IsSet($this->supported_locales[$locale]))
+								{
+									$this->locale = $locale;
+									break 2;
+								}
+							}
+						}
+					}
+					$_SESSION['locale'] = $this->locale;
+				}
+			}
+			if(strcmp($context, 'common')
+			&& !IsSet($this->locale_contexts['common']))
+				$this->LoadLocale('common');
+			$text = array();
+			$path = $this->application_path.'/configuration/locale/'.$this->locale.'/'.$context.'.php';
+			if(file_exists($path))
+			{
+				include($path);
+				if(count($text))
+					$this->text += $text;
+				$this->locale_contexts[$context] = $this->locale;
+			}
+			else
+				$this->OutputDebug('Missing locale file: "'.$path.'"');
+		}
+	}
+
+	Function LoadProfile($profile)
+	{
+		if(!IsSet($profile)
+		|| !IsSet($profile->locale)
+		|| !IsSet($this->supported_locales[$locale = strtok($profile->locale, '-')])
+		|| $this->locale === $locale)
+			return;
+		if($this->StartSession())
+		{
+			$contexts = array_keys($this->locale_contexts);
+			$this->text = $this->locale_contexts = array();
+			$this->locale = $_SESSION['locale'] = $locale;
+			foreach($contexts as $context)
+				$this->LoadLocale($context);
+		}
+	}
+
 	Function GetText($text)
 	{
 		if(IsSet($this->text[$text]))

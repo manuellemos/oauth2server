@@ -81,6 +81,7 @@ class oauth2_server_authorization_class
 			return false;
 		}
 		$this->options->debug_prefix = 'OAuth server authorization: ';
+		$this->options->LoadLocale('authorization');
 		return true;
 	}
 
