@@ -80,6 +80,7 @@ class oauth2_server_authorization_class
 			$this->error = 'the options object was not set in the authorization class';
 			return false;
 		}
+		$this->options->debug_prefix = 'OAuth server authorization: ';
 		return true;
 	}
 
@@ -118,13 +119,22 @@ class oauth2_server_authorization_class
 	{
 		if($this->error_code !== OAUTH2_ERROR_NONE)
 		{
+			$message = str_replace(array(
+					'{error_code}',
+					'{error_message}'
+				),
+				array(
+					$this->error_code,
+					$this->error_message
+				),
+				$this->options->GetText('It was not finish the authorization process due to an error ({error_code}): {error_message}')
+			);
 			$page_template = new page_template_class;
 			$page_template->options = $this->options;
 			$page_template->title_prefix = '';
-			$page_template->title =  HtmlSpecialChars($this->options->application_name);
 			$page_template->title = $this->options->GetHtmlText('Authorization error');
 			$page_template->header();
-			echo '<p>It was not finish the authorization process due to an error (',  $this->error_code, '): '.HtmlSpecialChars($this->error_message).'</p>';
+			echo '<p>'.HtmlSpecialChars($message).'</p>';
 			$page_template->footer();
 		}
 	}

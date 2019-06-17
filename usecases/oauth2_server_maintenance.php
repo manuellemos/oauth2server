@@ -20,6 +20,7 @@ class oauth2_server_maintenance_class
 			$this->error = 'the options object was not set in the maintenance class';
 			return false;
 		}
+		$this->options->debug_prefix = 'OAuth server maintenance: ';
 		return true;
 	}
 
@@ -35,9 +36,17 @@ class oauth2_server_maintenance_class
 
 	Function Output()
 	{
-		$message = 'Sorry the '.$this->options->application_name.' is not available due to maintenance work. Please return later.';
+		$message = str_replace('{application}', $this->options->application_name, $this->options->GetText('Sorry the {application} is not available due to maintenance work. Please return later.'));
 		if($this->web)
+		{
+			$page_template = new page_template_class;
+			$page_template->options = $this->options;
+			$page_template->title_prefix = '';
+			$page_template->title = $this->options->GetHtmlText('Authorization error');
+			$page_template->header();
 			echo '<p>'.HtmlSpecialChars($message).'</p>';
+			$page_template->footer();
+		}
 		else
 			echo $message, "\n";
 	}

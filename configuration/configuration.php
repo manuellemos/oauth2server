@@ -13,7 +13,7 @@ class configuration_options_class
 	public $debug_http = true;
 	public $maintenance = false;
 	public $debug_output = '';
-	public $debug_prefix = 'OAuth server authorization: ';
+	public $debug_prefix = 'OAuth server: ';
 	public $log_file_name = '';
 	public $report_missing_locale_text = true;
 	public $site_url = '';
