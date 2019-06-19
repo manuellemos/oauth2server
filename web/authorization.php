@@ -18,7 +18,7 @@
 		$case = new oauth2_server_maintenance_class;
 	else
 		$case = new oauth2_server_authorization_class;
-	$case->options = &$options;
+	$case->options = $options;
 	if(($success = $case->initialize()))
 		$success = $case->finalize($case->process());
 	if($case->exit)
@@ -28,7 +28,7 @@
 	else
 	{
 		$error_case = new oauth2_server_error_class;
-		$error_case->options = &$options;
+		$error_case->options = $options;
 		$error_case->error = $case->error;
 		if($error_case->initialize()
 		&& $error_case->finalize($error_case->process()))
