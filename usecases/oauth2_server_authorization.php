@@ -31,13 +31,6 @@ class oauth2_server_authorization_class
 		return true;
 	}
 	
-	Function CheckRedirectURI($redirect_uri, &$valid, &$match)
-	{
-		$valid = true;
-		$match = true;
-		return true;
-	}
-
 	Function ValidateRedirectURI(&$redirect_uri)
 	{
 		if(!IsSet($_GET['redirect_uri']))
@@ -46,7 +39,7 @@ class oauth2_server_authorization_class
 			return $this->SetAuthorizationError(OAUTH2_ERROR_MISSING_PARAMETER_REDIRECT_URI, 'the redirect_uri parameter is missing');
 		}
 		$redirect_uri = $_GET['redirect_uri'];
-		if(!$this->CheckRedirectURI($redirect_uri, $valid, $match))
+		if(!$this->handler->CheckRedirectURI($redirect_uri, $valid, $match))
 			return false;
 		if(!$valid)
 			return $this->SetAuthorizationError(OAUTH2_ERROR_INVALID_PARAMETER_REDIRECT_URI, 'the redirect_uri parameter is invalid');
@@ -55,6 +48,21 @@ class oauth2_server_authorization_class
 		return true;
 	}
 	
+	Function ValidateClientID(&$client_id)
+	{
+		if(!IsSet($_GET['client_id']))
+		{
+			$redirect_uri = null;
+			return $this->SetAuthorizationError(OAUTH2_ERROR_MISSING_PARAMETER_CLIENT_ID, 'the client_id parameter is missing');
+		}
+		$client_id = $_GET['client_id'];
+		if(!$this->handler->CheckClientID($client_id, $valid))
+			return false;
+		if(!$valid)
+			return $this->SetAuthorizationError(OAUTH2_ERROR_INVALID_PARAMETER_CLIENT_ID, 'the client_id parameter is invalid');
+		return true;
+	}
+
 	Function RedirectError($redirect_uri, $details, $state)
 	{
 		$redirect = $redirect_uri.'#';
@@ -72,6 +80,29 @@ class oauth2_server_authorization_class
 		$this->options->OutputDebug('Redirecting an error to: '.$redirect);
 		return true;
 	}
+
+	Function RedirectClient($redirect_uri, $parameters)
+	{
+		$redirect = $redirect_uri;
+		foreach($parameters as $name => $value)
+			$redirect .= (strpos($redirect, '?') === false ? '?' : '&').$name.'='.UrlEncode($value);
+		Header('HTTP/1.0 302 Redirect');
+		Header('Location: '.$redirect);
+		$this->options->OutputDebug('Redirecting a client to: '.$redirect);
+		return true;
+	}
+
+	Function GenerateResponseCode($client_id, &$code)
+	{
+		do
+		{
+			$code = md5(uniqid(rand(), true));
+			if(!$this->handler->CheckResponseCode($client_id, $code, $valid))
+				return false;
+		}
+		while(!$valid);
+		return true;
+	}
 	
 	Function Initialize()
 	{
@@ -82,6 +113,13 @@ class oauth2_server_authorization_class
 		}
 		$this->options->debug_prefix = 'OAuth server authorization: ';
 		$this->options->LoadLocale('authorization');
+		$this->handler = new $this->options->server_handler;
+		$this->handler->options = $this->options;
+		if(!$this->handler->Initialize())
+		{
+			$this->error = $this->handler->error;
+			return false;
+		}
 		return true;
 	}
 
@@ -108,11 +146,33 @@ class oauth2_server_authorization_class
 				return $this->RedirectError($redirect_uri, $details, $state);
 		}
 		$this->options->OutputDebug('The response type is: '.$response_type);
+		$this->options->OutputDebug('Checking the client id...');
+		if(!$this->ValidateClientID($client_id))
+			return false;
+		$this->options->OutputDebug('The client id is: '.$client_id);
+		switch($response_type)
+		{
+			case 'code':
+				$this->options->OutputDebug('Generating a response code...');
+				if(!$this->GenerateResponseCode($client_id, $code))
+					return false;
+				$parameters = array('code'=>$code);
+				if(IsSet($state))
+					$parameters['state'] = $state;
+				return $this->RedirectClient($redirect_uri, $parameters);
+			default:
+				return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization processs is not yet ready to handle responses of type '.$response_type);
+		}
 		return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization processs is not yet fully implemented');
 	}
 	
 	Function Finalize($success)
 	{
+		if(!$this->handler->Finalize($success))
+		{
+			$success = false;
+			$this->error = $this->handler->error;
+		}
 		return $success;
 	}
 

@@ -21,6 +21,7 @@ class configuration_options_class
 	public $theme = 'default';
 	public $google_site_verification = '';
 	public $web = true;
+	public $server_handler = 'oauth2_server_handler_default_class';
 
 	private $locale = 'en';
 	private $supported_locales = array(
