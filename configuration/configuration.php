@@ -1,9 +1,19 @@
 <?php
 /*
+ * options.php
  *
  * @(#) $Id: $
  *
  */
+
+define('OAUTH2_ERROR_NONE',                               0);
+define('OAUTH2_ERROR_MISSING_PARAMETER_REDIRECT_URI',     1);
+define('OAUTH2_ERROR_MISMATCHING_PARAMETER_REDIRECT_URI', 2);
+define('OAUTH2_ERROR_INVALID_PARAMETER_REDIRECT_URI',     3);
+define('OAUTH2_ERROR_MISSING_PARAMETER_CLIENT_ID',        4);
+define('OAUTH2_ERROR_INVALID_PARAMETER_CLIENT_ID',        5);
+define('OAUTH2_ERROR_UNSUPPORTED_GRANT_TYPE',             6);
+define('OAUTH2_ERROR_UNEXPECTED_SITUATION',               7);
 
 class configuration_options_class
 {
