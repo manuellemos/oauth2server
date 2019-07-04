@@ -12,6 +12,7 @@ class oauth2_server_error_class
 	public $exit = false;
 	public $options;
 	public $web = true;
+	public $api = false;
 
 	Function Initialize()
 	{
@@ -55,6 +56,14 @@ class oauth2_server_error_class
 			$page_template->header();
 			echo '<p>'.HtmlSpecialChars($message).'</p>';
 			$page_template->footer();
+		}
+		elseif($this->api)
+		{
+			$output = new stdClass;
+			$output->message = $message;
+			Header('HTTP/1.1 400 Bad Request');
+			Header('Content-Type: application/json;charset=UTF-8');
+			echo json_encode($output);
 		}
 		else
 			echo $message, "\n";
