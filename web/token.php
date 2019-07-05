@@ -10,7 +10,7 @@
 
 	require(APPLICATION_PATH.'/vendor/autoload.php');
 
-	$options = new configuration_options_class;
+	$options = new oauth2_server_configuration_options_class;
 	$options->application_path = APPLICATION_PATH;
 	$options->initialize();
 

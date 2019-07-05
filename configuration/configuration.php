@@ -19,7 +19,7 @@ define('OAUTH2_ERROR_INVALID_API_CALL',                   9);
 define('OAUTH2_ERROR_UNSUPPORTED_API_RESPONSE_TYPE',     10);
 define('OAUTH2_ERROR_UNEXPECTED_SITUATION',              11);
 
-class configuration_options_class
+class oauth2_server_configuration_options_class
 {
 	public $application_path = '';
 	public $application_name = 'OAuth 2 Server';

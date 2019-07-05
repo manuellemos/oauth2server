@@ -44,7 +44,6 @@ class oauth2_server_api_class
 			return false;
 		}
 		$this->options->debug_prefix = 'OAuth server api: ';
-//		$this->options->LoadLocale('api');
 		$this->handler = new $this->options->server_handler;
 		$this->handler->options = $this->options;
 		if(!$this->handler->Initialize())

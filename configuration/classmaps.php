@@ -5,6 +5,6 @@
  *
  */
 
- $__classmap += array('configuration_options_class'=>__DIR__.DIRECTORY_SEPARATOR.'configuration.php');
+ $__classmap += array('oauth2_server_configuration_options_class'=>__DIR__.DIRECTORY_SEPARATOR.'configuration.php');
  
 ?>
