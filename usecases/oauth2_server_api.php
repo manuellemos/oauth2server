@@ -102,7 +102,7 @@ class oauth2_server_api_class
 				return true;
 			}
 		}
-		return $this->SetAPIError(OAUTH2_ERROR_INVALID_API_CALL, 'it was not called a supported API call');
+		return $this->SetAPIError(OAUTH2_ERROR_INVALID_API_CALL, 'it was not called a supported API method');
 	}
 	
 	Function Finalize($success)
