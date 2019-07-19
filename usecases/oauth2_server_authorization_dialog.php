@@ -1,6 +1,6 @@
 <?php
 /*
- * auth2_server_authorization_dialog.php
+ * oauth2_server_authorization_dialog.php
  *
  * @(#) $Id: $
  *
