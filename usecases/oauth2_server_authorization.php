@@ -17,6 +17,7 @@ class oauth2_server_authorization_class
 	private $response_code;
 	private $redirect_uri;
 	private $state;
+	private $dialog;
 
 	Function SetAuthorizationError($error_code, $error_message)
 	{
@@ -117,6 +118,32 @@ class oauth2_server_authorization_class
 				return $this->RedirectError($redirect_uri, $details, $state);
 		}
 		$this->options->OutputDebug('The response type is: '.$response_type);
+		$scope = IsSet($_GET['scope']) ? $_GET['scope'] : null;
+		if(IsSet($this->options->authorization_dialog))
+		{
+			$this->options->OutputDebug('Obtaining use authorization...');
+			$this->dialog = new $this->options->authorization_dialog;
+			$this->dialog->options = $this->options;
+			$this->dialog->handler = $this->handler;
+			$this->dialog->scope = $scope;
+			if(($success = $this->dialog->initialize()))
+				$success = $this->dialog->finalize($this->dialog->process());
+			if($this->dialog->exit)
+			{
+				$this->exit - true;
+				return true;
+			}
+			if(!$success)
+			{
+				$this->error = $this->dialog->error;
+				return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization process is not yet ready to process the user authorization dialog');
+			}
+			$this->options->OutputDebug($this->dialog->authorized ? 'The user authorized the API access.' : 'The user did not yet authorized the API access.');
+			if(!$this->dialog->authorized)
+			{
+				return true;
+			}
+		}
 		switch($response_type)
 		{
 			case 'code':
@@ -125,7 +152,7 @@ class oauth2_server_authorization_class
 					'redirect_uri'=>$this->redirect_uri,
 					'response_type'=>$response_type,
 					'client_id'=>$client_id,
-					'scope'=>IsSet($_GET['scope']) ? $_GET['scope'] : null,
+					'scope'=>$scope,
 				);
 				return $this->GenerateResponseCode($parameters);
 			default:
@@ -146,7 +173,12 @@ class oauth2_server_authorization_class
 
 	Function Output()
 	{
-		if($this->error_code === OAUTH2_ERROR_NONE)
+		if(IsSet($this->dialog)
+		&& !$this->dialog->authorized)
+		{
+			$this->dialog->Output();
+		}
+		elseif($this->error_code === OAUTH2_ERROR_NONE)
 		{
 			$parameters = array('code'=>$this->response_code);
 			if(IsSet($this->state))

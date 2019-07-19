@@ -36,6 +36,7 @@ class oauth2_server_configuration_options_class
 	public $google_site_verification = '';
 	public $web = true;
 	public $server_handler = 'oauth2_server_handler_default_class';
+	public $authorization_dialog = 'oauth2_server_authorization_dialog_class';
 	public $api = array(
 	);
 
