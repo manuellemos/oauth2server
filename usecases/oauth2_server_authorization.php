@@ -138,7 +138,7 @@ class oauth2_server_authorization_class
 				$this->error = $this->dialog->error;
 				return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization process is not yet ready to process the user authorization dialog');
 			}
-			$this->options->OutputDebug($this->dialog->authorized ? 'The user authorized the API access.' : 'The user did not yet authorized the API access.');
+			$this->options->OutputDebug($this->dialog->authorized ? 'The user authorized to access the API.' : 'The user did not yet authorize to access the API.');
 			if(!$this->dialog->authorized)
 			{
 				return true;
