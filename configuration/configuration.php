@@ -39,6 +39,7 @@ class oauth2_server_configuration_options_class
 	public $authorization_dialog = 'oauth2_server_authorization_dialog_class';
 	public $api = array(
 	);
+	public $extra_locale_paths = array();
 
 	private $locale = 'en';
 	private $supported_locales = array(
@@ -224,16 +225,21 @@ class oauth2_server_configuration_options_class
 			&& !IsSet($this->locale_contexts['common']))
 				$this->LoadLocale('common');
 			$text = array();
-			$path = $this->application_path.'/configuration/locale/'.$this->locale.'/'.$context.'.php';
-			if(file_exists($path))
+			$locale_paths = $this->extra_locale_paths;
+			array_unshift($locale_paths, $this->application_path.'/configuration/locale');
+			foreach($locale_paths as $locale_path)
 			{
-				include($path);
-				if(count($text))
-					$this->text += $text;
-				$this->locale_contexts[$context] = $this->locale;
+				$path = $locale_path.'/'.$this->locale.'/'.$context.'.php';
+				if(file_exists($path))
+				{
+					include($path);
+					if(count($text))
+						$this->text += $text;
+					$this->locale_contexts[$context] = $this->locale;
+					return true;
+				}
 			}
-			else
-				$this->OutputDebug('Missing locale file: "'.$path.'"');
+			$this->OutputDebug('Missing locale file: "'.$path.'"');
 		}
 	}
 
