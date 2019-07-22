@@ -119,6 +119,7 @@ class oauth2_server_authorization_class
 		}
 		$this->options->OutputDebug('The response type is: '.$response_type);
 		$scope = IsSet($_GET['scope']) ? $_GET['scope'] : null;
+		$code = null;
 		if(IsSet($this->options->authorization_dialog))
 		{
 			$this->options->OutputDebug('Obtaining use authorization...');
@@ -136,24 +137,34 @@ class oauth2_server_authorization_class
 			if(!$success)
 			{
 				$this->error = $this->dialog->error;
-				return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization process is not yet ready to process the user authorization dialog');
+				return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization dialog failed to obtain the authorization code due to an internal error');
 			}
 			$this->options->OutputDebug($this->dialog->authorized ? 'The user authorized to access the API.' : 'The user did not yet authorize to access the API.');
 			if(!$this->dialog->authorized)
 			{
 				return true;
 			}
+			if(IsSet($this->dialog->code))
+			{
+				$code = $this->dialog->code;
+			}
 		}
 		switch($response_type)
 		{
 			case 'code':
-				$this->options->OutputDebug('Generating a response code...');
 				$parameters = array(
 					'redirect_uri'=>$this->redirect_uri,
 					'response_type'=>$response_type,
 					'client_id'=>$client_id,
 					'scope'=>$scope,
 				);
+				if(IsSet($code))
+				{
+					$this->options->OutputDebug('The dialog process returned the response code: '.$code);
+					$this->response_code = $code;
+					return true;
+				}
+				$this->options->OutputDebug('Generating a response code...');
 				return $this->GenerateResponseCode($parameters);
 			default:
 				return $this->SetAuthorizationError(OAUTH2_ERROR_UNEXPECTED_SITUATION, 'the authorization process is not yet ready to handle responses of type '.$response_type);

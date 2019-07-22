@@ -13,6 +13,7 @@ class oauth2_server_authorization_dialog_class
 	public $options;
 	public $handler;
 	public $authorized = false;
+	public $code = null;
 
 	private $authorized_parameter = 'authorized';
 

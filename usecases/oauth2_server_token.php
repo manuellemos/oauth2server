@@ -91,6 +91,9 @@ class oauth2_server_token_class
 		switch($grant_type)
 		{
 			case 'authorization_code':
+				if(!IsSet($_POST['code']))
+					return $this->SetTokenError(OAUTH2_ERROR_MISSING_ACCESS_TOKEN_CODE, 'It was not provided the authorization code to be exchanged for the access token value');
+				$code = $_POST['code'];
 				break;
 			default:
 				return $this->SetTokenError(OAUTH2_ERROR_UNSUPPORTED_GRANT_TYPE, 'The provided value for the input parameter \'authorization_code\' is not yet supported. Supported values are the following: \'authorization_code\'');
@@ -100,12 +103,13 @@ class oauth2_server_token_class
 		switch($grant_type)
 		{
 			case 'authorization_code':
-				$this->options->OutputDebug('Generating the access token...');
+				$this->options->OutputDebug('Obtaining the access token...');
 				$parameters = array(
 					'redirect_uri'=>$redirect_uri,
 					'grant_type'=>$grant_type,
 					'client_id'=>$client_id,
-					'client_secret'=>$client_secret
+					'client_secret'=>$client_secret,
+					'code'=>$code
 				);
 				return $this->GenerateAccessToken($parameters);
 			default:
