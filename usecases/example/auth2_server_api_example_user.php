@@ -32,7 +32,7 @@ class oauth2_server_api_example_user_class
 		return true;
 	}
 
-	Function Call()
+	Function Call($parameters)
 	{
 		$this->user = new StdClass;
 		$this->user->name = 'Some User Name';

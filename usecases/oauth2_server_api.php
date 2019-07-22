@@ -66,43 +66,58 @@ class oauth2_server_api_class
 		$uri = $_SERVER['REQUEST_URI'];
 		$method = $_SERVER['REQUEST_METHOD'];
 		$this->options->OutputDebug('Checking the API call URI: '.$uri);
+		$matched = null;
 		foreach($this->options->api as $name => $api)
 		{
+			if(strpos($uri, $api['pattern']) === false)
+			{
+				$matched = $name;
+				continue;
+			}
 			if(IsSet($api['methods'])
 			&& !in_array($method, $api['methods']))
 				continue;
-			if(strpos($uri, $api['pattern']) !== false)
+			$this->case = new $api['usecaseclass'];
+			if(IsSet($api['formatparameter']))
 			{
-				$this->case = new $api['usecaseclass'];
-				if(IsSet($api['formatparameter']))
+				$format = $api['formatparameter'];
+				if(IsSet($_GET[$format]))
 				{
-					$format = $api['formatparameter'];
-					if(IsSet($_GET[$format]))
-					{
-						$format = $_GET[$format];
-						if(!IsSet($this->supported_response_formats[$format]))
-							return $this->SetAPIError(OAUTH2_ERROR_UNSUPPORTED_API_RESPONSE_TYPE, $format.' is not a supported response format');
-						$this->format = $format;
-					}
+					$format = $_GET[$format];
+					if(!IsSet($this->supported_response_formats[$format]))
+						return $this->SetAPIError(OAUTH2_ERROR_UNSUPPORTED_API_RESPONSE_TYPE, $format.' is not a supported response format');
+					$this->format = $format;
 				}
-				$this->case->options = $this->options;
-				if(($success = $this->case->initialize()))
-				{
-					$this->options->OutputDebug('Executing the API call: '.$name);
-					$success = $this->case->call();
-					$success = $this->case->finalize($success);
-				}
-				if(!$success)
-				{
-					$this->error = $this->case->error;
-					$this->options->OutputDebug('Error: '.$this->error);
-					return false;
-				}
-				$this->exit = $this->case->exit;
-				return true;
 			}
+			switch($method)
+			{
+				case 'POST':
+					$parameters = $_POST;
+					break;
+				case 'GET':
+					$parameters = $_GET;
+					break;
+				default:
+					$parameters = array();
+					break;
+			}
+			$this->case->options = $this->options;
+			if(($success = $this->case->initialize()))
+			{
+				$this->options->OutputDebug('Executing the API call: '.$name);
+				$success = $this->case->call($parameters);
+				$success = $this->case->finalize($success);
+			}
+			if(!$success)
+			{
+				$this->error = $this->case->error;
+				$this->options->OutputDebug('Error: '.$this->error);
+				return false;
+			}
+			$this->exit = $this->case->exit;
+			return true;
 		}
-		return $this->SetAPIError(OAUTH2_ERROR_INVALID_API_CALL, 'it was not called a supported API method');
+		return $this->SetAPIError(OAUTH2_ERROR_INVALID_API_CALL, IsSet($matched) ? 'the HTTP method '.$method.' is not supported for API call '.$matched : 'it was not called a supported API method');
 	}
 	
 	Function Finalize($success)
