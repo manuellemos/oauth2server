@@ -69,11 +69,12 @@ class oauth2_server_api_class
 		$matched = null;
 		foreach($this->options->api as $name => $api)
 		{
-			if(strpos($uri, $api['pattern']) === false)
-			{
-				$matched = $name;
+			if((!IsSet($api['pattern'])
+			|| strpos($uri, $api['pattern']) === false)
+			&& (!IsSet($api['startpattern'])
+			|| substr($uri, 0, strlen($api['startpattern'])) !== $api['startpattern']))
 				continue;
-			}
+			$matched = $name;
 			if(IsSet($api['methods'])
 			&& !in_array($method, $api['methods']))
 				continue;
