@@ -151,6 +151,7 @@ class oauth2_server_api_class
 			}
 			Header('HTTP/1.1 200 OK');
 			Header('Content-Type: '.$content_type);
+			Header('Access-Control-Allow-Origin: *');
 			echo $output;
 		}
 		else
@@ -170,6 +171,7 @@ class oauth2_server_api_class
 
 			}
 			Header('Content-Type: application/json;charset=UTF-8');
+			Header('Access-Control-Allow-Origin: *');
 			echo json_encode($output);
 		}
 	}
