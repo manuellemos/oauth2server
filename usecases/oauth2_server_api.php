@@ -26,9 +26,9 @@ class oauth2_server_api_class
 		return true;
 	}
 
-	Function ValidateAccessToken($access_token, &$valid)
+	Function ValidateAccessToken($access_token, &$valid, &$user)
 	{
-		if(!$this->handler->ValidateAccessToken($access_token, $valid))
+		if(!$this->handler->ValidateAccessToken($access_token, $valid, $user))
 			return false;
 		$valid = ($this->handler->error_code === OAUTH2_ERROR_NONE);
 		if(!$valid)
@@ -58,7 +58,7 @@ class oauth2_server_api_class
 	{
 		$this->options->OutputDebug('Checking the API access token...');
 		$access_token = IsSet($_GET['access_token']) ? $_GET['access_token'] : null;
-		if(!$this->ValidateAccessToken($access_token, $valid))
+		if(!$this->ValidateAccessToken($access_token, $valid, $user))
 			return false;
 		$this->options->OutputDebug('The API access token ('.(IsSet($access_token) ? $access_token : '"not set"').') is '.($valid ? 'valid' : 'invalid').'.');
 		if(!$valid)
@@ -102,6 +102,8 @@ class oauth2_server_api_class
 					$parameters = array();
 					break;
 			}
+			if(IsSet($api['getuser']))
+				$parameters[$api['getuser']] = $user;
 			$this->case->options = $this->options;
 			if(($success = $this->case->initialize()))
 			{

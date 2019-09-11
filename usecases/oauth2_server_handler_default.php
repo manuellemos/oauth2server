@@ -79,8 +79,9 @@ class oauth2_server_handler_default_class
 		return true;
 	}
 
-	Function CheckValidAccessToken($token, &$valid)
+	Function CheckValidAccessToken($token, &$valid, &$user)
 	{
+		$user = null;
 		$valid = IsSet($token);
 		return true;
 	}
@@ -123,11 +124,12 @@ class oauth2_server_handler_default_class
 		return true;
 	}
 
-	Function ValidateAccessToken($access_token)
+	Function ValidateAccessToken($access_token, &$valid, &$user)
 	{
+		$user = null;
 		if(!IsSet($access_token))
 			return $this->SetHandlerError(OAUTH2_ERROR_MISSING_ACCESS_TOKEN, 'the access token value is missing');
-		if(!$this->CheckValidAccessToken($access_token, $valid))
+		if(!$this->CheckValidAccessToken($access_token, $valid, $user))
 			return false;
 		if(!$valid)
 			return $this->SetHandlerError(OAUTH2_ERROR_INVALID_ACCESS_TOKEN, 'the access token value is invalid');
