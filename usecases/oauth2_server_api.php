@@ -17,6 +17,7 @@ class oauth2_server_api_class
 	private $case;
 	private $format;
 	private $supported_response_formats = array('json'=>true);
+	private $default_format = 'json';
 
 	Function SetAPIError($error_code, $error_message)
 	{
@@ -79,17 +80,16 @@ class oauth2_server_api_class
 			&& !in_array($method, $api['methods']))
 				continue;
 			$this->case = new $api['usecaseclass'];
+			$format = $this->default_format;
 			if(IsSet($api['formatparameter']))
 			{
-				$format = $api['formatparameter'];
-				if(IsSet($_GET[$format]))
-				{
-					$format = $_GET[$format];
-					if(!IsSet($this->supported_response_formats[$format]))
-						return $this->SetAPIError(OAUTH2_ERROR_UNSUPPORTED_API_RESPONSE_TYPE, $format.' is not a supported response format');
-					$this->format = $format;
-				}
+				$parameter = $api['formatparameter'];
+				if(IsSet($_GET[$parameter]))
+					$format = $_GET[$parameter];
 			}
+			if(!IsSet($this->supported_response_formats[$format]))
+				return $this->SetAPIError(OAUTH2_ERROR_UNSUPPORTED_API_RESPONSE_TYPE, $format.' is not a supported response format');
+			$this->format = $format;
 			switch($method)
 			{
 				case 'POST':
@@ -141,6 +141,7 @@ class oauth2_server_api_class
 		if($this->error_code === OAUTH2_ERROR_NONE)
 		{
 			$output = $this->case->output();
+			$content_type = 'text/plain;charset=UTF-8';
 			if(IsSet($this->format))
 			{
 				switch($this->format)
