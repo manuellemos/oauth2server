@@ -104,6 +104,11 @@ class oauth2_server_api_class
 			}
 			if(IsSet($api['getuser']))
 				$parameters[$api['getuser']] = $user;
+			if(IsSet($api['getaction']))
+			{
+				$action = $api['getaction'];
+				$parameters[$action['action']] = $action['value'];
+			}
 			$this->case->options = $this->options;
 			if(($success = $this->case->initialize()))
 			{
