@@ -47,15 +47,18 @@ class oauth2_server_authorization_class
 
 	Function RedirectError($redirect_uri, $details, $state)
 	{
-		$redirect = $redirect_uri.'#';
-		$first = true;
+		$redirect = $redirect_uri;
+		$first = strpos('?', $redirect) === false;
 		foreach($details as $name => $value)
 		{
 			if($first)
+			{
 				$first = false;
+				$redirect .= '?';
+			}
 			else
 				$redirect .= '&';
-			$redirect .= $name.'='.$value;
+			$redirect .= $name.'='.UrlEncode($value);
 		}
 		Header('HTTP/1.0 302 Redirect');
 		Header('Location: '.$redirect);
@@ -111,11 +114,12 @@ class oauth2_server_authorization_class
 			case 'code':
 				break;
 			default:
+				$this->error_code = (IsSet($_GET['response_type']) ? OAUTH2_ERROR_MISSING_RESPONSE_TYPE : OAUTH2_ERROR_INVALID_RESPONSE_TYPE);
 				$details = array(
 					'error'=>'unsupported_response_type',
 					'error_description'=>'The provided value for the input parameter \'response_type\' is not supported. Supported values are the following: \'code\'',
 				);
-				return $this->RedirectError($redirect_uri, $details, $state);
+				return $this->RedirectError($this->redirect_uri, $details, $this->state);
 		}
 		$this->options->OutputDebug('The response type is: '.$response_type);
 		$scope = IsSet($_GET['scope']) ? $_GET['scope'] : null;

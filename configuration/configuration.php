@@ -19,7 +19,9 @@ define('OAUTH2_ERROR_MISSING_ACCESS_TOKEN',               9);
 define('OAUTH2_ERROR_INVALID_ACCESS_TOKEN',              10);
 define('OAUTH2_ERROR_INVALID_API_CALL',                  11);
 define('OAUTH2_ERROR_UNSUPPORTED_API_RESPONSE_TYPE',     12);
-define('OAUTH2_ERROR_UNEXPECTED_SITUATION',              13);
+define('OAUTH2_ERROR_MISSING_RESPONSE_TYPE',             13);
+define('OAUTH2_ERROR_INVALID_RESPONSE_TYPE',             14);
+define('OAUTH2_ERROR_UNEXPECTED_SITUATION',              15);
 
 class oauth2_server_configuration_options_class
 {
