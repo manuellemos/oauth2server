@@ -80,6 +80,11 @@ class oauth2_server_authorization_class
 		}
 		$this->options->debug_prefix = 'OAuth server authorization: ';
 		$this->options->LoadLocale('authorization');
+		if(!IsSet($this->options->server_handler))
+		{
+				$this->error = 'the options object does not define the server_handler class option';
+				return false;
+		}
 		$this->handler = new $this->options->server_handler;
 		$this->handler->options = $this->options;
 		if(!$this->handler->Initialize())
