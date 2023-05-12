@@ -14,6 +14,8 @@ class oauth2_server_error_class
 	public $web = true;
 	public $api = false;
 
+	private $debug_output;
+
 	Function Initialize()
 	{
 		if(!IsSet($this->options))
@@ -23,6 +25,8 @@ class oauth2_server_error_class
 		}
 		$this->options->debug_prefix = 'OAuth server error: ';
 		$this->options->LoadLocale('error');
+		$this->debug_output = new debug_template_class;
+		$this->debug_output->options = $this->options;
 		return true;
 	}
 
@@ -55,6 +59,11 @@ class oauth2_server_error_class
 			$page_template->title = str_replace('{application}', $this->options->application_name, $this->options->GetHtmlText('{application} error'));
 			$page_template->header();
 			echo '<p>'.HtmlSpecialChars($message).'</p>';
+			if($this->options->debug)
+			{
+				$this->debug_output->Error($this->error);
+				$this->debug_output->Debug($this->debug);
+			}
 			$page_template->footer();
 		}
 		elseif($this->api)
