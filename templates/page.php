@@ -30,6 +30,8 @@ class page_template_class
 	var $type = '';
 	var $url = '';
 	var $menu = '';
+	var $form_method = '';
+	var $form_action = ''; 
 
 	Function GetCSS()
 	{
@@ -130,7 +132,17 @@ body { color: black ; font-family: arial, helvetica, sans-serif; margin: 0px; pa
 		if($this->use_theme)
 		{
 			$divider = '{body}';
-			if(($template = file_get_contents($this->options->application_path.'/templates/theme/'.$this->options->theme.'/template.html')) === false)
+			$template_file = $this->options->application_path.'/templates/theme/'.$this->options->theme.'/template.html';
+			if(!file_exists($template_file))
+			{
+				$template_file = __DIR__.'/../templates/theme/'.$this->options->theme.'/template.html';
+				if(!file_exists($template_file))
+				{
+					$template_file = __DIR__.'/../templates/theme/default/template.html';
+				}
+				return false;
+			}
+			if(($template = file_get_contents($template_file)) === false)
 				$template = $divider;
 			$template = str_replace('{site}', $this->options->site_url, $template);
 			$menu = $this->menu;
@@ -197,6 +209,26 @@ body { color: black ; font-family: arial, helvetica, sans-serif; margin: 0px; pa
 		$footer = ob_get_contents();
 		ob_end_clean();
 		return($footer);
+	}
+
+	Function GetFormHeader()
+	{
+		return '<form method="'.HtmlSpecialChars($this->form_method).'" action="'.HtmlSpecialChars($this->form_action).'">';
+	}
+
+	Function FormHeader()
+	{
+		echo $this->GetFormHeader();
+	}
+
+	Function GetFormFooter()
+	{
+		return '</form>';
+	}
+
+	Function FormFooter()
+	{
+		echo $this->GetFormFooter();
 	}
 
 	Function GetTitleMessage($message, $class = '')
