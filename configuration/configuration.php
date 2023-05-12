@@ -41,6 +41,7 @@ class oauth2_server_configuration_options_class
 	public $web = true;
 	public $server_handler = 'oauth2_server_handler_default_class';
 	public $authorization_dialog = 'oauth2_server_authorization_dialog_class';
+	public $login_dialog = null;
 	public $api = array(
 	);
 	public $extra_locale_paths = array();
@@ -276,6 +277,16 @@ class oauth2_server_configuration_options_class
 	Function GetHTMLText($text)
 	{
 		return(HtmlSpecialChars($this->GetText($text)));
+	}
+
+	Function GetAccessKey($text)
+	{
+		return(preg_match('/<u>([^<]+)<\\/u>/', $this->GetText($text), $m) ? $m[1] : '');
+	}
+
+	Function GetFieldText($text)
+	{
+		return(str_replace('<u>', '', str_replace('</u>', '', $this->GetText($text))));
 	}
 };
 
