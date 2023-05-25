@@ -13,6 +13,7 @@ class oauth2_server_error_class
 	public $options;
 	public $web = true;
 	public $api = false;
+	public $debug = false;
 
 	private $debug_output;
 
