@@ -122,7 +122,7 @@ class oauth2_server_authorization_class
 				$this->error_code = (IsSet($_GET['response_type']) ? OAUTH2_ERROR_MISSING_RESPONSE_TYPE : OAUTH2_ERROR_INVALID_RESPONSE_TYPE);
 				$details = array(
 					'error'=>'unsupported_response_type',
-					'error_description'=>'The provided value for the input parameter \'response_type\' is not supported. Supported values are the following: \'code\'',
+					'error_description'=>IsSet($_GET['response_type']) ? 'The provided value for the input parameter \'response_type\' is not supported. Supported values are the following: \'code\'' : 'The input parameter \'response_type\' is missing in the request URL.',
 				);
 				return $this->RedirectError($this->redirect_uri, $details, $this->state);
 		}
