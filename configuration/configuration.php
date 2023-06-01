@@ -45,6 +45,7 @@ class oauth2_server_configuration_options_class
 	public $api = array(
 	);
 	public $extra_locale_paths = array();
+	public $die_on_exception = true;
 
 	private $locale = 'en';
 	private $supported_locales = array(
@@ -123,12 +124,21 @@ class oauth2_server_configuration_options_class
 		if(IsSet($error))
 			$this->ErrorHandler($error['type'], $error['message'], $error['file'], $error['line'], array());
 	}
+	
+	Function ExceptionHandler($exception)
+	{
+		$message = $this->application_name.' exception: '.print_r($exception, 1);
+		$this->OutputDebug($message);
+		if($this->die_on_exception)
+			die('Currently the '.$this->application_name.' is having an issue'.($this->debug ? ': '.$message : ''));
+	}
 
 	Function Initialize()
 	{
 		ini_set('default_charset', 'UTF-8');
 		set_error_handler(array(&$this, 'CommonErrorHandler'));
 		register_shutdown_function(array(&$this, "FatalErrorHandler"));
+		set_exception_handler(array(&$this, "ExceptionHandler"));
 		$local_options=$this->application_path.'/configuration/local_options.php';
 		if(strlen($this->application_path)
 		&& file_exists($local_options))
