@@ -32,6 +32,7 @@ class oauth2_server_configuration_options_class
 	public $maintenance = false;
 	public $debug_output = '';
 	public $debug_prefix = 'OAuth server: ';
+	public $display_debug = false;
 	public $log_file_name = '';
 	public $report_missing_locale_text = true;
 	public $site_url = '';
@@ -189,6 +190,10 @@ class oauth2_server_configuration_options_class
 			$this->debug_output .= $message."\n";
 			if(strlen($this->log_file_name))
 				error_log($message."\n", 3, $this->log_file_name);
+			elseif($this->display_debug)
+			{
+				echo $message."\n";
+			}
 			else
 				error_log($message);
 		}
