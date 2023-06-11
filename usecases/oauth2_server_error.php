@@ -43,12 +43,15 @@ class oauth2_server_error_class
 
 	Function Output()
 	{
+		$error = $this->error;
+		if(GetType($error) !== 'string')
+			$error = serialize($error);
 		$message = str_replace(array(
 				'{error}',
 				'{application}'
 			),
 			array(
-				$this->error,
+				$error,
 				$this->options->application_name, 
 			),
 			$this->options->GetText('{application} error: {error}'));
@@ -62,7 +65,7 @@ class oauth2_server_error_class
 			echo '<p>'.HtmlSpecialChars($message).'</p>';
 			if($this->options->debug)
 			{
-				$this->debug_output->Error($this->error);
+				$this->debug_output->Error($error));
 				$this->debug_output->Debug($this->debug);
 			}
 			$page_template->footer();
