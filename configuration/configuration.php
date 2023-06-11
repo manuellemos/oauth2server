@@ -22,6 +22,7 @@ define('OAUTH2_ERROR_UNSUPPORTED_API_RESPONSE_TYPE',     12);
 define('OAUTH2_ERROR_MISSING_RESPONSE_TYPE',             13);
 define('OAUTH2_ERROR_INVALID_RESPONSE_TYPE',             14);
 define('OAUTH2_ERROR_UNEXPECTED_SITUATION',              15);
+define('OAUTH2_ERROR_UNSUPPORTED_API_REQUEST_TYPE',      16);
 
 class oauth2_server_configuration_options_class
 {
@@ -131,7 +132,11 @@ class oauth2_server_configuration_options_class
 		$message = $this->application_name.' exception: '.print_r($exception, 1);
 		$this->OutputDebug($message);
 		if($this->die_on_exception)
-			die('Currently the '.$this->application_name.' is having an issue'.($this->debug ? ': '.$message : ''));
+		{
+			$message = 'Currently the '.$this->application_name.' is having an issue';
+			Header('HTTP/1.1 500 '.$message);
+			die($message.($this->debug ? ': '.$message : ''));
+		}
 	}
 
 	Function Initialize()
