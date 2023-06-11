@@ -93,7 +93,39 @@ class oauth2_server_api_class
 			switch($method)
 			{
 				case 'POST':
-					$parameters = $_POST;
+					$request_content_type = (IsSet($api['requestcontenttype']) ? $api['requestcontenttype'] : 'application/x-www-form-urlencoded');
+					switch($request_content_type)
+					{
+						case 'application/x-www-form-urlencoded':
+							$parameters = $_POST;
+							break;
+						case 'application/json':
+							if(!($request_data = file_get_contents('php://input')))
+							{
+								$this->error = 'it was not possible to read the API request parameters';
+								echo $a;
+								$error = error_get_last();
+								if(IsSet($error)
+								&& IsSet($error['message']))
+									$this->error .= ': '.$error['message'];
+								return false;
+							}
+							$decoded_request_data = json_decode($request_data);
+							$type = GetType($decoded_request_data);
+							switch($type)
+							{
+								case 'object':
+								case 'array':
+									break;
+								default:
+									return $this->SetAPIError(OAUTH2_ERROR_UNSUPPORTED_API_REQUEST_TYPE, $type.' is not yet a supported request JSON data type');
+							}
+							$parameter = (IsSet($api['getrequestdata']) ? $api['getrequestdata'] : 'requestdata');
+							$parameters = array($parameter => json_decode($request_data));
+							break;
+						default:
+							return $this->SetAPIError(OAUTH2_ERROR_UNSUPPORTED_API_REQUEST_TYPE, $request_content_type.' is not yet a supported request format');
+					}
 					break;
 				case 'GET':
 					$parameters = $_GET;
@@ -119,7 +151,10 @@ class oauth2_server_api_class
 			if(!$success)
 			{
 				$this->error = $this->case->error;
-				$this->options->OutputDebug('Error: '.$this->error);
+				$error = $this->error;
+				if(GetType($error) !== 'string')
+					$error = serialize(error);
+				$this->options->OutputDebug('Error: '.$error);
 				return false;
 			}
 			$this->exit = $this->case->exit;
