@@ -65,7 +65,7 @@ class oauth2_server_error_class
 			echo '<p>'.HtmlSpecialChars($message).'</p>';
 			if($this->options->debug)
 			{
-				$this->debug_output->Error($error));
+				$this->debug_output->Error($error);
 				$this->debug_output->Debug($this->debug);
 			}
 			$page_template->footer();
