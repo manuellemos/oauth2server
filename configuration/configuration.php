@@ -134,8 +134,9 @@ class oauth2_server_configuration_options_class
 		if($this->die_on_exception)
 		{
 			$message = 'Currently the '.$this->application_name.' is having an issue';
-			Header('HTTP/1.1 500 '.$message);
-			die($message.($this->debug ? ': '.$message : ''));
+			if($this->web)
+				Header('HTTP/1.1 500 '.$message);
+			die($message.($this->debug ? ': '.print_r($exception, 1) : ''));
 		}
 	}
 
