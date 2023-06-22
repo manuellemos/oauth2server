@@ -15,6 +15,7 @@
 	'oauth2_server_login_dialog_class'=>__DIR__.DIRECTORY_SEPARATOR.'oauth2_server_login_dialog.php',
 	'oauth2_server_maintenance_class'=>__DIR__.DIRECTORY_SEPARATOR.'oauth2_server_maintenance.php',
 	'oauth2_server_token_class'=>__DIR__.DIRECTORY_SEPARATOR.'oauth2_server_token.php',
+	'oauth2_server_user_validation_class'=>__DIR__.DIRECTORY_SEPARATOR.'oauth2_server_user_validation.php',
 );
  
 ?>
