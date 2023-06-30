@@ -55,7 +55,7 @@ class oauth2_server_user_validation_class
 							return true;
 						}
 					}
-					$this->validation_error_code = this::user_validation_error_none;
+					$this->validation_error_code = $this::user_validation_error_none;
 					return true;
 
 				default:
