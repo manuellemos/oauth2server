@@ -67,6 +67,7 @@ class oauth2_server_api_class
 		$uri = $_SERVER['REQUEST_URI'];
 		$method = $_SERVER['REQUEST_METHOD'];
 		$this->options->OutputDebug('Checking the API call URI: '.$uri);
+		$this->options->OutputDebug('HTTP request method: '.$method);
 		$matched = null;
 		foreach($this->options->api as $name => $api)
 		{
@@ -110,6 +111,7 @@ class oauth2_server_api_class
 									$this->error .= ': '.$error['message'];
 								return false;
 							}
+							$this->options->OutputDebug('Request parameters data: '.print_r($request_data, 1));
 							$decoded_request_data = json_decode($request_data);
 							$type = GetType($decoded_request_data);
 							switch($type)
@@ -134,6 +136,7 @@ class oauth2_server_api_class
 					$parameters = array();
 					break;
 			}
+			$this->options->OutputDebug('Request parameters: '.print_r($parameters, 1));
 			if(IsSet($api['getuser']))
 				$parameters[$api['getuser']] = $user;
 			if(IsSet($api['getaction']))
