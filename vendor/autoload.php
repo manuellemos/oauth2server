@@ -31,6 +31,6 @@ spl_autoload_register(function($class)
 		else
 			include $class_file;
 	}
-}, false, true);
+}, true, true);
 
 ?>
